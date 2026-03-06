@@ -1,0 +1,75 @@
+import asyncio
+from playwright.async_api import async_playwright
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
+from datetime import datetime, timedelta
+import pytz
+
+async def get_companies_from_einforma():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1")
+        page = await context.new_page()
+        
+        await page.goto("https://www.einforma.pt/novas-empresas-portuguesas")
+        await page.wait_for_selector("ul li a[href*='ETIQUETA_EMPRESA']")
+        
+        links = await page.query_selector_all("ul li a[href*='ETIQUETA_EMPRESA']")
+        
+        today_str = datetime.now(pytz.timezone('Europe/Lisbon')).strftime("%d-%m-%Y")
+        yesterday_str = (datetime.now(pytz.timezone('Europe/Lisbon')) - timedelta(days=1)).strftime("%d-%m-%Y")
+        
+        companies = []
+        for link in links:
+            text = await link.inner_text()
+            if today_str in text or yesterday_str in text:
+                href = await link.get_attribute("href")
+                nif = href.split("/")[-1] if "/" in href else ""
+                name = text.split(" - ", 1)[-1] if " - " in text else text
+                companies.append({"name": name, "nif": nif, "url": f"https://www.einforma.pt{href}"})
+        
+        final_list = []
+        for comp in companies:
+            try:
+                await page.goto(comp['url'], timeout=10000)
+                loc_elem = await page.query_selector("text='Morada:' >> xpath=..")
+                comp['location'] = (await loc_elem.inner_text()).replace("Morada:", "").strip() if loc_elem else "N/A"
+                act_elem = await page.query_selector("text='Atividade (CAE):' >> xpath=..")
+                comp['activity'] = (await act_elem.inner_text()).replace("Atividade (CAE):", "").strip() if act_elem else "N/A"
+                comp['responsible'] = "Desconhecido"
+                comp['contacts'] = "N/A"
+                final_list.append(comp)
+            except:
+                pass
+        await browser.close()
+        return final_list
+
+def send_email(companies):
+    sender_email = "hugo.galaz.ferreira@gmail.com"
+    receiver_email = "geral@hugogalaz.pt"
+    password = os.environ.get("GMAIL_APP_PASSWORD")
+    if not password: return
+
+    msg = MIMEMultipart()
+    msg['From'] = f"Agente Portugal Empresas <{sender_email}>"
+    msg['To'] = receiver_email
+    msg['Subject'] = f"🚀 Novas Empresas Portugal - {datetime.now(pytz.timezone('Europe/Lisbon')).strftime('%d/%m/%Y')}"
+    
+    html = f"<html><body><h2>Empresas criadas nas últimas 24h</h2><table border='1'><tr><th>Nome</th><th>Responsável</th><th>Contactos</th><th>Localidade</th><th>Atividade</th></tr>"
+    for c in companies:
+        html += f"<tr><td><b>{c['name']}</b><br>NIF: {c['nif']}</td><td>{c['responsible']}</td><td>{c['contacts']}</td><td>{c['location']}</td><td>{c['activity']}</td></tr>"
+    html += "</table></body></html>"
+    msg.attach(MIMEText(html, 'html'))
+    
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, password)
+        server.send_message(msg)
+
+async def main():
+    companies = await get_companies_from_einforma()
+    send_email(companies)
+
+if __name__ == "__main__":
+    asyncio.run(main())
