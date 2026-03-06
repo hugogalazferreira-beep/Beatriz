@@ -1,0 +1,28 @@
+name: Daily Company Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Every day at 6:00 AM UTC (approx. 6:00 AM WET)
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-companies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Run agent
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python main.py
