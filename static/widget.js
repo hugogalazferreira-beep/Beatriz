@@ -71,6 +71,15 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1.0); }
         }
+        #mic-btn.recording {
+            animation: pulse 1.5s infinite;
+            color: #ef4444;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
     `;
     document.head.appendChild(style);
 
@@ -105,6 +114,11 @@
             <!-- Input -->
             <div class="p-4 border-t border-gray-800 bg-gray-900">
                 <form id="beatriz-form" class="flex items-center space-x-2">
+                    <button type="button" id="mic-btn" class="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                    </button>
                     <input type="text" id="beatriz-input"
                         class="flex-grow bg-gray-800 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border-gray-700 outline-none"
                         placeholder="Escreva uma mensagem..." required>
@@ -115,6 +129,7 @@
                     </button>
                 </form>
             </div>
+            <audio id="beatriz-audio" class="hidden"></audio>
         </div>
 
         <!-- Floating Button -->
@@ -133,8 +148,49 @@
     const messageContainer = document.getElementById('beatriz-messages');
     const chatForm = document.getElementById('beatriz-form');
     const chatInput = document.getElementById('beatriz-input');
+    const micBtn = document.getElementById('mic-btn');
+    const audioPlayer = document.getElementById('beatriz-audio');
 
     let history = JSON.parse(sessionStorage.getItem('beatriz_history')) || [];
+    let recognition = null;
+
+    // Speech Recognition Setup
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-PT';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            micBtn.classList.add('recording');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value = transcript;
+            chatForm.dispatchEvent(new Event('submit'));
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            micBtn.classList.remove('recording');
+        };
+
+        recognition.onend = () => {
+            micBtn.classList.remove('recording');
+        };
+
+        micBtn.onclick = () => {
+            if (micBtn.classList.contains('recording')) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        };
+    } else {
+        micBtn.style.display = 'none';
+    }
 
     function toggleChat() {
         chatWindow.classList.toggle('open');
@@ -186,10 +242,15 @@
         if (typingDiv) typingDiv.remove();
     }
 
+    function playAudio(base64Audio) {
+        if (!base64Audio) return;
+        audioPlayer.src = `data:audio/mpeg;base64,${base64Audio}`;
+        audioPlayer.play().catch(e => console.error('Audio playback failed', e));
+    }
+
     // Initialize Chat
     if (history.length === 0) {
         addMessage(INITIAL_MESSAGE, 'model');
-        // Add initial message to history so the model knows it was already sent
         history.push({ role: 'model', parts: INITIAL_MESSAGE });
         sessionStorage.setItem('beatriz_history', JSON.stringify(history));
     } else {
@@ -225,6 +286,10 @@
                 addMessage(data.response, 'model');
                 history = data.history;
                 sessionStorage.setItem('beatriz_history', JSON.stringify(history));
+
+                if (data.audio_base64) {
+                    playAudio(data.audio_base64);
+                }
             } else {
                 addMessage('Desculpe, ocorreu um erro ao processar o seu pedido.', 'model');
             }

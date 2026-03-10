@@ -1,4 +1,5 @@
 import os
+import base64
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,6 +8,7 @@ from typing import List, Optional
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
@@ -17,7 +19,7 @@ origins = [
     "https://hugogalaz.lovable.app",
     "http://localhost:8000",
     "http://localhost:3000",
-    "http://localhost:5173", # Common Vite port
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -39,6 +41,10 @@ if api_key:
 else:
     print("Warning: GEMINI_API_KEY not found in environment variables.")
 
+# ElevenLabs Config
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM") # Default Rachel or PT voice
+
 SYSTEM_PROMPT = (
     "You are Beatriz, the AI sales and qualification assistant for Hugo Galaz (Consultant in IT, Cybersecurity, and AI with over 25 years of experience).\n"
     "Your language is strictly European Portuguese (PT-PT).\n"
@@ -56,12 +62,42 @@ SYSTEM_PROMPT = (
 )
 
 class Message(BaseModel):
-    role: str  # 'user' or 'model'
+    role: str
     parts: str
 
 class ChatRequest(BaseModel):
     message: str
     history: Optional[List[Message]] = []
+
+def text_to_speech_base64(text: str) -> Optional[str]:
+    if not ELEVENLABS_API_KEY:
+        return None
+
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
+    headers = {
+        "Accept": "audio/mpeg",
+        "Content-Type": "application/json",
+        "xi-api-key": ELEVENLABS_API_KEY
+    }
+    data = {
+        "text": text,
+        "model_id": "eleven_multilingual_v2",
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.5
+        }
+    }
+
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code == 200:
+            return base64.b64encode(response.content).decode('utf-8')
+        else:
+            print(f"ElevenLabs Error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"ElevenLabs Exception: {e}")
+        return None
 
 @app.get("/")
 async def root():
@@ -73,7 +109,6 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
 
     try:
-        # Convert history to Gemini format
         chat_history = []
         for msg in request.history:
             chat_history.append(types.Content(
@@ -89,11 +124,15 @@ async def chat(request: ChatRequest):
             )
         )
 
+        text_response = response.text
+        audio_base64 = text_to_speech_base64(text_response)
+
         return {
-            "response": response.text,
+            "response": text_response,
+            "audio_base64": audio_base64,
             "history": request.history + [
                 Message(role="user", parts=request.message),
-                Message(role="model", parts=response.text)
+                Message(role="model", parts=text_response)
             ]
         }
     except Exception as e:

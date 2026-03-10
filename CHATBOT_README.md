@@ -53,4 +53,5 @@ To add the Beatriz chatbot to your website, copy and paste the following `<scrip
 -   **Modern UI:** Dark mode by default with Tech Blue (#3b82f6) accents.
 -   **AI Persona:** Beatriz is programmed to qualify visitors and offer a 15-minute diagnostic call.
 -   **Session Persistence:** Chat history is maintained as long as the user's browser session is active.
+-   **Voice Interaction:** Supports Speech-to-Text (STT) using the Web Speech API and Text-to-Speech (TTS) using ElevenLabs.
 -   **Fully Embeddable:** Uses Tailwind CSS via CDN for styling, requiring no complex frontend build process.
