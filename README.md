@@ -31,8 +31,27 @@ Este agente está configurado para correr no **GitHub Actions**. Para que funcio
 
 O agente correrá automaticamente todos os dias às 6h (UTC).
 
+## Ferramenta de Licenciamento (CLI)
+
+O projeto inclui agora uma ferramenta para gerar e verificar chaves de licença baseadas no ID da máquina (MAC address).
+
+### Como usar
+
+1. **Gerar uma chave para a máquina atual:**
+   ```bash
+   python license_tool.py generate
+   ```
+   Isto exibirá o MAC address detetado e a chave de licença correspondente em blocos (ex: `GA3DU-MBQHJ-...`).
+
+2. **Verificar uma chave:**
+   ```bash
+   python license_tool.py verify <CHAVE-AQUI>
+   ```
+   O script confirmará se a chave é válida para o hardware onde está a ser executado.
+
 ## Ficheiros do Projeto
 
 - `main.py`: Lógica principal do agente.
+- `license_tool.py`: Utilitário de geração e verificação de licenças.
 - `.github/workflows/daily_agent.yml`: Configuração da automação diária.
 - `requirements.txt`: Dependências do projeto.
