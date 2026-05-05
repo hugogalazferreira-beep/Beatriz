@@ -6,6 +6,8 @@ import app.models as models
 from app.models import SessionLocal, engine
 import os
 from app.routers import auth, api
+from app.auth import get_current_user_from_cookie
+from fastapi.responses import RedirectResponse
 
 models.init_db()
 
@@ -37,13 +39,17 @@ async def login_page(request: Request):
 
 @app.get("/dashboard")
 async def dashboard(request: Request):
-    # This will be protected later
-    return templates.TemplateResponse(request, "dashboard.html")
+    user = get_current_user_from_cookie(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return templates.TemplateResponse(request, "dashboard.html", {"user": user})
 
 @app.get("/admin")
 async def admin_panel(request: Request):
-    # This will be protected later
-    return templates.TemplateResponse(request, "admin.html")
+    user = get_current_user_from_cookie(request)
+    if not user or not user.is_admin:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return templates.TemplateResponse(request, "admin.html", {"user": user})
 
 if __name__ == "__main__":
     import uvicorn

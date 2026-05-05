@@ -3,8 +3,9 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 import os
+from .models import SessionLocal, User
 
 # Configurações de segurança
 SECRET_KEY = os.environ.get("SECRET_KEY", "portal_do_consultor_secret_key_2026")
@@ -29,3 +30,27 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def get_current_user_from_cookie(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return None
+
+    try:
+        # Remove "Bearer " prefix if exists
+        if token.startswith("Bearer "):
+            token = token[7:]
+
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            return None
+    except JWTError:
+        return None
+
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.username == username).first()
+        return user
+    finally:
+        db.close()

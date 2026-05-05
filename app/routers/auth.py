@@ -28,8 +28,10 @@ async def login(
 
     access_token = auth_lib.create_access_token(data={"sub": user.username})
 
-    # Em produção usaríamos cookies seguros
-    response = RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    # Redirecionar baseado no tipo de utilizador
+    target_url = "/admin" if user.is_admin else "/dashboard"
+
+    response = RedirectResponse(url=target_url, status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
     return response
 

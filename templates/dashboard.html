@@ -59,16 +59,19 @@
     <main class="flex-grow overflow-y-auto p-8">
         <header class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-2xl font-bold">Olá, <span class="tech-blue">Ana Silva</span></h1>
+                <h1 class="text-2xl font-bold">Olá, <span class="tech-blue">{{ user.full_name }}</span></h1>
                 <p class="text-gray-400">Aqui está o resumo do seu desempenho.</p>
             </div>
             <div class="flex items-center space-x-4">
-                <button class="glass p-2 rounded-lg hover:bg-white/5">
+                <button class="glass p-2 rounded-lg hover:bg-white/5 relative">
                     <i class="fas fa-bell"></i>
+                    <span id="notif-dot" class="hidden absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
                 <div class="flex items-center space-x-3 glass px-4 py-2 rounded-xl">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">AS</div>
-                    <span class="text-sm font-medium">Consultor Bronze</span>
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">
+                        {{ user.full_name[:2].upper() }}
+                    </div>
+                    <span class="text-sm font-medium">Consultor {{ user.tier or 'Bronze' }}</span>
                 </div>
             </div>
         </header>
@@ -80,10 +83,9 @@
                     <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center tech-blue">
                         <i class="fas fa-euro-sign text-xl"></i>
                     </div>
-                    <span class="text-xs text-green-400 font-bold">+12%</span>
                 </div>
                 <h3 class="text-gray-400 text-sm font-medium">Saldo Disponível</h3>
-                <p class="text-2xl font-bold">€1,250.00</p>
+                <p id="stat-earned" class="text-2xl font-bold">€0.00</p>
             </div>
             <div class="glass p-6 rounded-2xl">
                 <div class="flex items-center justify-between mb-4">
@@ -92,7 +94,7 @@
                     </div>
                 </div>
                 <h3 class="text-gray-400 text-sm font-medium">Comissões Pendentes</h3>
-                <p class="text-2xl font-bold">€450.00</p>
+                <p id="stat-pending" class="text-2xl font-bold">€0.00</p>
             </div>
             <div class="glass p-6 rounded-2xl">
                 <div class="flex items-center justify-between mb-4">
@@ -100,8 +102,8 @@
                         <i class="fas fa-shopping-cart text-xl"></i>
                     </div>
                 </div>
-                <h3 class="text-gray-400 text-sm font-medium">Vendas este mês</h3>
-                <p class="text-2xl font-bold">24</p>
+                <h3 class="text-gray-400 text-sm font-medium">Vendas Realizadas</h3>
+                <p id="stat-count" class="text-2xl font-bold">0</p>
             </div>
             <div class="glass p-6 rounded-2xl">
                 <div class="flex items-center justify-between mb-4">
@@ -124,31 +126,8 @@
             <!-- Recent Sales -->
             <div class="glass p-6 rounded-2xl">
                 <h3 class="text-lg font-bold mb-6">Vendas Recentes</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-bolt text-yellow-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold">EDP - Dual</p>
-                                <p class="text-xs text-gray-500">Há 2 horas</p>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold text-green-400">€50.00</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-signal text-blue-500"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold">NOS - Fibra</p>
-                                <p class="text-xs text-gray-500">Ontem</p>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold text-green-400">€45.00</span>
-                    </div>
+                <div id="recent-sales-list" class="space-y-4">
+                    <p class="text-gray-500 text-sm italic">Nenhuma venda registada.</p>
                 </div>
                 <button class="w-full mt-6 py-2 text-sm tech-blue font-bold hover:underline">Ver tudo</button>
             </div>
@@ -156,6 +135,56 @@
     </main>
 
     <script>
+        // Carregar dados reais
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard-stats');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('stat-earned').textContent = `€${data.total_earned.toFixed(2)}`;
+                    document.getElementById('stat-pending').textContent = `€${data.pending_commission.toFixed(2)}`;
+                    document.getElementById('stat-count').textContent = data.sales_count;
+                }
+
+                const salesResponse = await fetch('/api/my-sales');
+                if (salesResponse.ok) {
+                    const sales = await salesResponse.json();
+                    const list = document.getElementById('recent-sales-list');
+                    if (sales.length > 0) {
+                        list.innerHTML = sales.map(s => `
+                            <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
+                                        <i class="fas ${s.product_name.includes('NOS') || s.product_name.includes('MEO') ? 'fa-signal text-blue-500' : 'fa-bolt text-yellow-500'}"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold">${s.product_name}</p>
+                                        <p class="text-xs text-gray-500">${s.date} - ${s.client_name}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-green-400">€${s.commission.toFixed(2)}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase">${s.status}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+                const notifResponse = await fetch('/api/notifications');
+                if (notifResponse.ok) {
+                    const notifs = await notifResponse.json();
+                    if (notifs.length > 0) {
+                        document.getElementById('notif-dot').classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+            }
+        }
+
+        loadDashboardData();
+
         const ctx = document.getElementById('earningsChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
