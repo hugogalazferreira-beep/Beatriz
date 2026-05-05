@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-pt" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Portal do Consultor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tech-blue { color: #3b82f6; }
+        .bg-tech-blue { background-color: #3b82f6; }
+        .sidebar-item:hover { background-color: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; }
+        .sidebar-item.active { background-color: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 glass border-r border-white/10 flex-shrink-0 flex flex-col">
+        <div class="p-6">
+            <img src="/static/img/logo.svg" alt="Logo" class="h-8">
+        </div>
+        <nav class="flex-grow">
+            <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Operacional</div>
+            <a href="#" class="sidebar-item active flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-home mr-3 w-5"></i> Dashboard
+            </a>
+            <a href="#" class="sidebar-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-plus-circle mr-3 w-5"></i> Registar Venda
+            </a>
+            <a href="#" class="sidebar-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-table mr-3 w-5"></i> Comissões
+            </a>
+
+            <div class="mt-6 px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Financeiro</div>
+            <a href="#" class="sidebar-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-wallet mr-3 w-5"></i> Resgates
+            </a>
+            <a href="#" class="sidebar-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-file-invoice-dollar mr-3 w-5"></i> Faturação
+            </a>
+
+            <div class="mt-6 px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Suporte</div>
+            <a href="#" class="sidebar-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-all">
+                <i class="fas fa-ticket-alt mr-3 w-5"></i> Meus Tickets
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <a href="/logout" class="flex items-center px-6 py-3 text-red-400 hover:text-red-300 transition-all">
+                <i class="fas fa-sign-out-alt mr-3 w-5"></i> Sair
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow overflow-y-auto p-8">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold">Olá, <span class="tech-blue">Ana Silva</span></h1>
+                <p class="text-gray-400">Aqui está o resumo do seu desempenho.</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="glass p-2 rounded-lg hover:bg-white/5">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="flex items-center space-x-3 glass px-4 py-2 rounded-xl">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">AS</div>
+                    <span class="text-sm font-medium">Consultor Bronze</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center tech-blue">
+                        <i class="fas fa-euro-sign text-xl"></i>
+                    </div>
+                    <span class="text-xs text-green-400 font-bold">+12%</span>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Saldo Disponível</h3>
+                <p class="text-2xl font-bold">€1,250.00</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-orange-500">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Comissões Pendentes</h3>
+                <p class="text-2xl font-bold">€450.00</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center text-green-500">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Vendas este mês</h3>
+                <p class="text-2xl font-bold">24</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-500">
+                        <i class="fas fa-star text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Rating Médio</h3>
+                <p class="text-2xl font-bold">4.9/5</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Chart -->
+            <div class="lg:col-span-2 glass p-6 rounded-2xl">
+                <h3 class="text-lg font-bold mb-6">Evolução de Ganhos</h3>
+                <canvas id="earningsChart" height="200"></canvas>
+            </div>
+
+            <!-- Recent Sales -->
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="text-lg font-bold mb-6">Vendas Recentes</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-bolt text-yellow-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold">EDP - Dual</p>
+                                <p class="text-xs text-gray-500">Há 2 horas</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-green-400">€50.00</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-signal text-blue-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold">NOS - Fibra</p>
+                                <p class="text-xs text-gray-500">Ontem</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-green-400">€45.00</span>
+                    </div>
+                </div>
+                <button class="w-full mt-6 py-2 text-sm tech-blue font-bold hover:underline">Ver tudo</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const ctx = document.getElementById('earningsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Ganhos (€)',
+                    data: [800, 1200, 950, 1500, 1250, 1800],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
