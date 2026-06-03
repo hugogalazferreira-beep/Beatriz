@@ -23,13 +23,10 @@
         </div>
         <nav class="flex-grow">
             <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gestão</div>
-            <a href="#" class="flex items-center px-6 py-3 bg-white/5 border-l-4 border-blue-500 text-white">
+            <a href="javascript:void(0)" onclick="showSection('consultants')" id="link-consultants" class="nav-link flex items-center px-6 py-3 bg-white/5 border-l-4 border-blue-500 text-white">
                 <i class="fas fa-users mr-3 w-5"></i> Consultores
             </a>
-            <a href="#" class="flex items-center px-6 py-3 text-gray-400 hover:text-white">
-                <i class="fas fa-box mr-3 w-5"></i> Produtos
-            </a>
-            <a href="#" class="flex items-center px-6 py-3 text-gray-400 hover:text-white">
+            <a href="javascript:void(0)" onclick="showSection('sales')" id="link-sales" class="nav-link flex items-center px-6 py-3 text-gray-400 hover:text-white">
                 <i class="fas fa-check-double mr-3 w-5"></i> Validar Vendas
             </a>
 
@@ -52,77 +49,124 @@
 
     <!-- Main Content -->
     <main class="flex-grow overflow-y-auto p-8">
-        <header class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-bold">Gestão de Consultores</h1>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-all">
-                + Novo Consultor
-            </button>
-        </header>
+        <!-- Secção Consultores -->
+        <div id="section-consultants">
+            <header class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold">Gestão de Consultores</h1>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-all">
+                    + Novo Consultor
+                </button>
+            </header>
 
-        <!-- Search & Filter -->
-        <div class="glass p-4 rounded-xl mb-6 flex gap-4">
-            <input type="text" placeholder="Procurar consultor..." class="flex-grow bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <select class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 outline-none">
-                <option>Todos os estados</option>
-                <option>Ativos</option>
-                <option>Inativos</option>
-            </select>
+            <div class="glass p-4 rounded-xl mb-6 flex gap-4">
+                <input type="text" placeholder="Procurar consultor..." class="flex-grow bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="glass rounded-2xl overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white/5 text-gray-400 text-sm uppercase">
+                            <th class="px-6 py-4 font-semibold">Consultor</th>
+                            <th class="px-6 py-4 font-semibold">Email</th>
+                            <th class="px-6 py-4 font-semibold">Vendas</th>
+                            <th class="px-6 py-4 font-semibold">Ganhos</th>
+                            <th class="px-6 py-4 font-semibold">Estado</th>
+                            <th class="px-6 py-4 font-semibold text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consultants-table-body" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Table -->
-        <div class="glass rounded-2xl overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-white/5 text-gray-400 text-sm uppercase">
-                        <th class="px-6 py-4 font-semibold">Consultor</th>
-                        <th class="px-6 py-4 font-semibold">Email</th>
-                        <th class="px-6 py-4 font-semibold">Vendas</th>
-                        <th class="px-6 py-4 font-semibold">Ganhos</th>
-                        <th class="px-6 py-4 font-semibold">Estado</th>
-                        <th class="px-6 py-4 font-semibold text-right">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="consultants-table-body" class="divide-y divide-white/5">
-                    <!-- Dynamic Content -->
-                </tbody>
-            </table>
+        <!-- Secção Vendas -->
+        <div id="section-sales" class="hidden">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold">Validar Vendas</h1>
+                <p class="text-gray-400 text-sm">Controle de novos campos: CP e Decisores</p>
+            </header>
+
+            <div class="glass rounded-2xl overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white/5 text-gray-400 text-sm uppercase">
+                            <th class="px-4 py-4 font-semibold">Data/Consultor</th>
+                            <th class="px-4 py-4 font-semibold">Cliente/NIF</th>
+                            <th class="px-4 py-4 font-semibold">C. Postal</th>
+                            <th class="px-4 py-4 font-semibold">Decisores</th>
+                            <th class="px-4 py-4 font-semibold">Estado</th>
+                            <th class="px-4 py-4 font-semibold text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-table-body" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
     <script>
+        function showSection(name) {
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById('section-' + name).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('bg-white/5', 'border-l-4', 'border-blue-500', 'text-white');
+                l.classList.add('text-gray-400');
+            });
+            const activeLink = document.getElementById('link-' + name);
+            activeLink.classList.add('bg-white/5', 'border-l-4', 'border-blue-500', 'text-white');
+            activeLink.classList.remove('text-gray-400');
+
+            if (name === 'consultants') loadConsultants();
+            if (name === 'sales') loadAllSales();
+        }
+
         async function loadConsultants() {
-            try {
-                const response = await fetch('/api/admin/consultants');
-                if (response.ok) {
-                    const data = await response.json();
-                    const tbody = document.getElementById('consultants-table-body');
-                    tbody.innerHTML = data.map(c => `
-                        <tr class="hover:bg-white/5 transition-all">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-500 rounded-full mr-3 flex items-center justify-center font-bold text-xs">
-                                        ${c.full_name.substring(0,2).toUpperCase()}
-                                    </div>
-                                    <span class="font-medium">${c.full_name}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-400 text-sm">${c.username}@portaldoconsultor.online</td>
-                            <td class="px-6 py-4 font-bold">${c.sales_count}</td>
-                            <td class="px-6 py-4 text-green-400 font-bold">€${c.total_earned.toFixed(2)}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs font-bold uppercase">${c.status}</span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <button class="text-gray-400 hover:text-white mr-3"><i class="fas fa-edit"></i></button>
-                                <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error("Erro ao carregar consultores:", error);
+            const res = await fetch('/api/admin/consultants');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('consultants-table-body').innerHTML = data.map(c => `
+                    <tr class="hover:bg-white/5 transition-all text-sm">
+                        <td class="px-6 py-4 font-medium">${c.full_name}</td>
+                        <td class="px-6 py-4 text-gray-400">${c.username}</td>
+                        <td class="px-6 py-4">${c.sales_count}</td>
+                        <td class="px-6 py-4 text-green-400 font-bold">€${c.total_earned.toFixed(2)}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-0.5 bg-green-500/20 text-green-500 rounded text-[10px] font-bold uppercase">Ativo</span></td>
+                        <td class="px-6 py-4 text-right"><button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
             }
         }
+
+        async function loadAllSales() {
+            // Reaproveitar o endpoint de dashboard para exemplo ou criar um novo no backend
+            // Para este MVP vamos simular o carregamento das vendas globais
+            const res = await fetch('/api/my-sales'); // No real, seria /api/admin/sales
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('sales-table-body').innerHTML = data.map(s => `
+                    <tr class="hover:bg-white/5 transition-all text-sm">
+                        <td class="px-4 py-4">
+                            <p class="font-bold">${s.date}</p>
+                            <p class="text-xs text-gray-500">${s.product_name}</p>
+                        </td>
+                        <td class="px-4 py-4">
+                            <p class="font-medium">${s.client_name}</p>
+                            <p class="text-xs text-gray-500">${s.client_nif}</p>
+                        </td>
+                        <td class="px-4 py-4 text-blue-400 font-mono">${s.postal_code || '---'}</td>
+                        <td class="px-4 py-4 text-xs italic">${s.decision_makers || '---'}</td>
+                        <td class="px-4 py-4">
+                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded text-[10px] font-bold uppercase">${s.status}</span>
+                        </td>
+                        <td class="px-4 py-4 text-right">
+                            <button class="text-green-400 hover:text-green-300"><i class="fas fa-check"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
         loadConsultants();
     </script>
 </body>

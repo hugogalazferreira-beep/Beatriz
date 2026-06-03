@@ -53,6 +53,8 @@ async def create_sale(
     product_id: int = Form(...),
     client_name: str = Form(...),
     client_nif: str = Form(...),
+    postal_code: str = Form(None),
+    decision_makers: str = Form(None),
     notes: str = Form(None),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -69,6 +71,8 @@ async def create_sale(
         product_id=product.id,
         client_name=client_name,
         client_nif=client_nif,
+        postal_code=postal_code,
+        decision_makers=decision_makers,
         commission_earned=product.commission_value, # Lógica base
         status="Pending",
         notes=notes
@@ -134,6 +138,9 @@ async def get_my_sales(user: User = Depends(get_current_user), db: Session = Dep
             "id": s.id,
             "product_name": product.name if product else "Desconhecido",
             "client_name": s.client_name,
+            "client_nif": s.client_nif,
+            "postal_code": s.postal_code,
+            "decision_makers": s.decision_makers,
             "commission": s.commission_earned,
             "status": s.status,
             "date": s.created_at.strftime("%d/%m/%Y")

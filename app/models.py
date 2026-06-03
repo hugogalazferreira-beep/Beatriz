@@ -47,6 +47,8 @@ class Sale(Base):
     product_id = Column(Integer, ForeignKey("products.id"))
     client_name = Column(String)
     client_nif = Column(String)
+    postal_code = Column(String)
+    decision_makers = Column(String)
     status = Column(String, default="Pending") # Pending, Validated, Rejected, Paid
     commission_earned = Column(Float)
     notes = Column(Text)
