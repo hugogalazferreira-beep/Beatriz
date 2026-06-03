@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-pt" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal do Consultor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tech-blue { color: #3b82f6; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav class="w-full p-6">
+        <a href="/">
+            <img src="/static/img/logo.svg" alt="Logo" class="h-8">
+        </a>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-2">Bem-vindo de volta</h1>
+                <p class="text-gray-400">Entre na sua área de consultor</p>
+            </div>
+
+            <form action="/login" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Utilizador ou Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" name="username" required class="block w-full pl-10 pr-3 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white" placeholder="ana.silva">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Palavra-passe</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" name="password" required class="block w-full pl-10 pr-3 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-blue-500">
+                        <span class="ml-2 text-gray-400">Lembrar-me</span>
+                    </label>
+                    <a href="#" class="tech-blue hover:underline">Esqueceu a senha?</a>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20">
+                    Entrar no Portal
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-white/5 text-center">
+                <p class="text-gray-400 text-sm">Ainda não é consultor? <a href="#" class="tech-blue font-bold hover:underline">Candidate-se aqui</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-6 text-center text-gray-600 text-xs">
+        © 2026 Portal do Consultor. Sistema Seguro e Encriptado.
+    </footer>
+</body>
+</html>

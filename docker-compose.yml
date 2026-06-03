@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./portal.db:/app/portal.db
+    environment:
+      - SECRET_KEY=your_very_secret_key_here
+      - NODE_ENV=production
+    restart: always

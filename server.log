@@ -1,0 +1,23 @@
+INFO:     Started server process [229336]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:40578 - "GET /login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /static/img/logo.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "POST /login HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:40578 - "GET /dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/dashboard-stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/my-sales HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "POST /api/sales HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/dashboard-stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/my-sales HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /logout HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:40578 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "POST /login HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:40578 - "GET /admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/admin/consultants HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40578 - "GET /api/my-sales HTTP/1.1" 200 OK
