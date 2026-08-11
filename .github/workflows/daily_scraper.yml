@@ -1,0 +1,32 @@
+name: Daily Companies Scraper
+
+on:
+  schedule:
+    # Runs at 06:00 Lisbon time. (Note: Lisbon is GMT/UTC in winter, GMT+1 in summer. Using 05:00 UTC as an approximation or 06:00 UTC)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Permite correr manualmente
+
+jobs:
+  scrape-and-email:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r todas_empresas_pt/requirements.txt
+        playwright install chromium
+
+    - name: Run script
+      env:
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      run: |
+        python todas_empresas_pt/get_all_companies.py
