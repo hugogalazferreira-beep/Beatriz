@@ -103,7 +103,7 @@ def export_to_excel(data, filename="todas_empresas_pt.xlsx"):
     return filepath
 
 def send_email_with_excel(filepath):
-    sender_email = "beatriz@gfconsulting.pt"
+    sender_email = "hugo.galaz.ferreira@gmail.com"
     receiver_emails = ["geral@hugogalaz.pt", "davidafpinto@me.com"]
     password = os.environ.get("GMAIL_APP_PASSWORD")
 
